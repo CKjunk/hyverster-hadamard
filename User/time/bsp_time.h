@@ -1,63 +1,43 @@
 #ifndef BSP_TIME_H
 #define	BSP_TIME_H
-
+//注意一下，周期比实际值小一，分频系数比实际减一，宽度就是实际值
 #include "stm32f4xx.h"
 #include <stdio.h>
- /* 定时器 */
-#define ADVANCE_TIM1                   TIM1
-#define ADVANCE_TIM1_CLK               RCC_APB2Periph_TIM1
-#define ADVANCE_TIM8                   TIM8
-#define ADVANCE_TIM8_CLK               RCC_APB2Periph_TIM8
-#define ADVANCE_TIM2                   TIM2
-#define ADVANCE_TIM2_CLK               RCC_APB1Periph_TIM2
-/* TIM1通道1输出引脚 */
-#define ADVANCE_OCPWM1_PIN             GPIO_Pin_8
-#define ADVANCE_OCPWM1_GPIO_PORT       GPIOA
-#define ADVANCE_OCPWM1_GPIO_CLK        RCC_AHB1Periph_GPIOA
-#define ADVANCE_OCPWM1_PINSOURCE       GPIO_PinSource8
-#define ADVANCE_OCPWM1_AF              GPIO_AF_TIM1
+#define PERIOD 400-1  //实际周期为PWM_PERIOD
 
-/* TIM1通道1互补输出引脚 */
-#define ADVANCE_OCNPWM1_PIN            GPIO_Pin_7
-#define ADVANCE_OCNPWM1_GPIO_PORT      GPIOA
-#define ADVANCE_OCNPWM1_GPIO_CLK       RCC_AHB1Periph_GPIOA
-#define ADVANCE_OCNPWM1_PINSOURCE      GPIO_PinSource7
-#define ADVANCE_OCNPWM1_AF             GPIO_AF_TIM1
+#define TIM_ADC1_LOWTIME 400-1
+#define SENIOR_PSC  180-1  
+#define COMMON_PSC  90-1 //// 通用控制定时器时钟源TIMxCLK = HCLK/2=90MHz 
 
-/* TIM8通道1输出引脚 */
-#define ADVANCE_OCPWM8_PIN             GPIO_Pin_6
-#define ADVANCE_OCPWM8_GPIO_PORT       GPIOC
-#define ADVANCE_OCPWM8_GPIO_CLK        RCC_AHB1Periph_GPIOC
-#define ADVANCE_OCPWM8_PINSOURCE       GPIO_PinSource6
-#define ADVANCE_OCPWM8_AF              GPIO_AF_TIM8
+#define PULSE_PERIOD   400-1
+#define PULSE_WIDTH    200
+ 
+#define SENIOR_TIM                   TIM1
+#define SENIOR_TIM_CLK               RCC_APB2Periph_TIM1
+#define SENIOR_TIM_INT_FUNCTION      TIM1_UP_TIM10_IRQHandler
+#define SENIOR_TIM_INT_CHANNEL			 TIM1_UP_TIM10_IRQn
 
-/* TIM8通道1互补输出引脚 */
-#define ADVANCE_OCNPWM8_PIN            GPIO_Pin_5
-#define ADVANCE_OCNPWM8_GPIO_PORT      GPIOA
-#define ADVANCE_OCNPWM8_GPIO_CLK       RCC_AHB1Periph_GPIOA
-#define ADVANCE_OCNPWM8_PINSOURCE      GPIO_PinSource5
-#define ADVANCE_OCNPWM8_AF             GPIO_AF_TIM8
-
-
-/* TIM2通道1输出引脚 */
 
 /*通用定时器*/
 /* 通用定时器 */
-#define GENERAL_TIM                   TIM2
-#define GENERAL_TIM_CLK               RCC_APB1Periph_TIM2
- 
-#define COMMON_TIM_IRQn                TIM2_IRQHandler
+#define TIM2_GPIO                   TIM2
+#define TIM2_GPIO_CLK               RCC_APB1Periph_TIM2
+#define TIM2_GPIO_INT_FUNCTION      TIM2_IRQHandler
+#define TIM2_GPIO_INT_CHANNEL				TIM2_IRQn
 
 
-/*基本定时器*/
-#define BASIC_TIM               TIM6
-#define BASIC_TIM_CLK           RCC_APB1Periph_TIM6
+#define TIM_ADC1                TIM8
+#define TIM_ADC1_CLK            RCC_APB2Periph_TIM8
+#define TIM_ADC1_PWM_PIN        GPIO_Pin_6
+#define TIM_ADC1_GPIO_PORT      GPIOC
+#define TIM_ADC1_GPIO_CLK       RCC_AHB1Periph_GPIOC
+#define TIM_ADC1_PWM_PINSOURCE  GPIO_PinSource6
+#define TIM_ADC1_PWM_AF				  GPIO_AF_TIM8
 
-#define BASIC_TIM_IRQn          TIM6_DAC_IRQn
-#define BASIC_TIM_IRQHandler    TIM6_DAC_IRQHandler
-
-static void SENIOR_TIMx_GPIO_Config(void);
-static void COMMON_TIMx_Config(u16 arr,u16 psc);
-static void BASIC_TIMx_Config(void);
-
+#define TIM_ADC1_IRQn         TIM8_UP_TIM13_IRQn
+#define TIM_ADC1_IRQHandler   TIM8_UP_TIM13_IRQHandler
+//void TIM1_GPIO_Config(u16 Arr,u16 Psc);
+void TIM1_GPIO_Config(u16 arr,u16 psc,u16 adc_pwm_lowtime);
+  
+void TIM8_ADC_Config(u16 arr,u16 psc,u16 adc_pwm_lowtime);
 #endif 

@@ -40,3 +40,10 @@
 ..\..\output\main.o: ..\..\User\./usart/bsp_debug_usart.h
 ..\..\output\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
 ..\..\output\main.o: ..\..\User\./adc/bsp_adc.h
+..\..\output\main.o: ..\..\User\./sequence/sequence.h
+..\..\output\main.o: ..\..\User\./time/bsp_time.h
+..\..\output\main.o: ..\..\User\./key/key.h
+..\..\output\main.o: ..\..\User\./adc_dma/adc_dma.h
+..\..\output\main.o: ..\..\User\./led/bsp_led.h
+..\..\output\main.o: ..\..\User\./usart_dma/usart_dma.h
+..\..\output\main.o: ..\..\User\./HadamardOutput/bsp_dma_gpio.h

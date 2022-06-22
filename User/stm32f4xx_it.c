@@ -1,175 +1,84 @@
-/**
-  ******************************************************************************
-  * @file    Project/STM32F4xx_StdPeriph_Templates/stm32f4xx_it.c 
-  * @author  MCD Application Team
-  * @version V1.5.0
-  * @date    06-March-2015
-  * @brief   Main Interrupt Service Routines.
-  *          This file provides template for all exceptions handler and 
-  *          peripherals interrupt service routine.
-  ******************************************************************************
-  * @attention
-  *
-  * <h2><center>&copy; COPYRIGHT 2015 STMicroelectronics</center></h2>
-  *
-  * Licensed under MCD-ST Liberty SW License Agreement V2, (the "License");
-  * You may not use this file except in compliance with the License.
-  * You may obtain a copy of the License at:
-  *
-  *        http://www.st.com/software_license_agreement_liberty_v2
-  *
-  * Unless required by applicable law or agreed to in writing, software 
-  * distributed under the License is distributed on an "AS IS" BASIS, 
-  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  * See the License for the specific language governing permissions and
-  * limitations under the License.
-  *
-  ******************************************************************************
-  */
-
-/* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx_it.h"
 #include "./usart/bsp_debug_usart.h"
 #include "./time/bsp_time.h"
 #include "./adc/bsp_adc.h"
+#include "./key/key.h"
+#include "./adc_dma/adc_dma.h"
+#include "./usart_dma/usart_dma.h"
+#include "./HadamardOutput/bsp_dma_gpio.h"
+#include "./sequence/sequence.h"
 
-/** @addtogroup STM32F429I_DISCOVERY_Examples
-  * @{
-  */
+extern TEN  ten;
+extern TEN* pten;
+extern u16  count;
+extern u8   display_flag;
+u8 MODIFY_TIM8_PULSE = 1;
+void TOTAL_PROJECT_INT_FUNCTION(void){
+	if(EXTI_GetITStatus(KEY_INT_EXTI_LINE)!= RESET){
+ 		  TIM_Cmd(SENIOR_TIM, ENABLE);
+	//	TIM_Cmd(TIM8, ENABLE);
 
-/** @addtogroup FMC_SDRAM
-  * @{
-  */ 
 
-/* Private typedef -----------------------------------------------------------*/
-/* Private define ------------------------------------------------------------*/
-/* Private macro -------------------------------------------------------------*/
-/* Private variables ---------------------------------------------------------*/
-/* Private function prototypes -----------------------------------------------*/
-/* Private functions ---------------------------------------------------------*/
-
-/******************************************************************************/
-/*            Cortex-M4 Processor Exceptions Handlers                         */
-/******************************************************************************/
-
-/**
-  * @brief  This function handles NMI exception.
-  * @param  None
-  * @retval None
-  */
-void NMI_Handler(void)
-{
-}
-
-/**
-  * @brief  This function handles Hard Fault exception.
-  * @param  None
-  * @retval None
-  */
-void HardFault_Handler(void)
-{
-  /* Go to infinite loop when Hard Fault exception occurs */
-  while (1)
-  {}
-}
-
-/**
-  * @brief  This function handles Memory Manage exception.
-  * @param  None
-  * @retval None
-  */
-void MemManage_Handler(void)
-{
-  /* Go to infinite loop when Memory Manage exception occurs */
-  while (1)
-  {}
-}
-
-/**
-  * @brief  This function handles Bus Fault exception.
-  * @param  None
-  * @retval None
-  */
-void BusFault_Handler(void)
-{
-  /* Go to infinite loop when Bus Fault exception occurs */
-  while (1)
-  {}
-}
-
-/**
-  * @brief  This function handles Usage Fault exception.
-  * @param  None
-  * @retval None
-  */
-void UsageFault_Handler(void)
-{
-  /* Go to infinite loop when Usage Fault exception occurs */
-  while (1)
-  {}
-}
-
-/**
-  * @brief  This function handles Debug Monitor exception.
-  * @param  None
-  * @retval None
-  */
-void DebugMon_Handler(void)
-{}
-
-/**
-  * @brief  This function handles SVCall exception.
-  * @param  None
-  * @retval None
-  */
-void SVC_Handler(void)
-{}
-
-/**
-  * @brief  This function handles PendSV_Handler exception.
-  * @param  None
-  * @retval None
-  */
-void PendSV_Handler(void)
-{}
-
-/**
-  * @brief  This function handles SysTick Handler.
-  * @param  None
-  * @retval None
-  */
-void SysTick_Handler(void)
-{}
-
-/******************************************************************************/
-/*                 STM32F4xx Peripherals Interrupt Handlers                   */
-/*  Add here the Interrupt Handler for the used peripheral(s) (PPP), for the  */
-/*  available peripheral interrupt handler's name please refer to the startup */
-/*  file (startup_stm32f429_439xx.s).                         */
-/******************************************************************************/
-
-extern __IO uint16_t ADC_ConvertedValue;
-
-// ADC 转换完成中断服务程序
-void ADC_IRQHandler(void)
-{
-	if(ADC_GetITStatus(RHEOSTAT_ADC,ADC_IT_EOC)==SET)
-	{
-  // 读取ADC的转换值
-		ADC_ConvertedValue = ADC_GetConversionValue(RHEOSTAT_ADC);
+   EXTI_ClearITPendingBit(EXTI_Line0); //清除LINE0上的中断标志位
 
 	}
-	ADC_ClearITPendingBit(RHEOSTAT_ADC,ADC_IT_EOC);
+}
+void DMA_ADC_COMP_INT_FUNCTION(void){
+    if(DMA_GetITStatus(RHEOSTAT_ADC_DMA_STREAM,DMA_IT_TCIF0))
+	  {
+		    
+      // SENIOR_TIM->CR1 &= (uint16_t)~TIM_CR1_CEN;
+			 display_flag = 1;		
+		   //TIM_Cmd(ADC1_External_TIM,DISABLE);
+			 
+			 DMA_ClearITPendingBit(RHEOSTAT_ADC_DMA_STREAM,DMA_FLAG_TCIF0);		   			 
+	  }
+}
 
-}	
 
+//void HADAMARD_GPIO_COMP_INT_FUNCTION(void){
+//   if(DMA_GetITStatus(HADAMARD_GPIO_DMA_STREAM,DMA_IT_TCIF5)){
+// 		 printf("GPIO complete\r\n");
+//		 TIM_DMACmd(SENIOR_TIM, TIM_DMA_Update,DISABLE); 
+
+//		 DMA_ClearITPendingBit(HADAMARD_GPIO_DMA_STREAM,DMA_FLAG_TCIF5);		 
+//	 }
+//}
+
+
+void TIM_ADC1_IRQHandler(void){
+	 if(TIM_GetFlagStatus(TIM_ADC1,TIM_IT_Update)){
+//  		  if(MODIFY_TIM8_PULSE == 1){
+//				TIM_ADC1->CCR1 =  PULSE_WIDTH;
+//				MODIFY_TIM8_PULSE = 0;
+//      }
+	   TIM_ClearITPendingBit(TIM_ADC1,TIM_IT_Update);
+ 	 }
+}
+ 
 	
-/**
-  * @}
-  */ 
+void SENIOR_TIM_INT_FUNCTION(void){
+	if(TIM_GetITStatus(SENIOR_TIM, TIM_IT_Update)){
+  	if(pten->address[count]==1){
+			SENIOR_TIM->CCR1  =  0;
+		 
+		}
+		else if(pten->address[count]==0){
+			SENIOR_TIM->CCR1  =  PERIOD+1;	     	
+		}
+		if(count == 1023){
+			  SENIOR_TIM->CCR1  =  PERIOD+1;
+			 	//TIM_ITConfig(TIM2_GPIO,TIM_IT_Update,DISABLE); //使能指定的TIM2中断,允许更新中断
+     }
+		else if(count == 1024){
+		   TIM_ADC1->CR1 &= (uint16_t)~TIM_CR1_CEN;
 
-/**
-  * @}
-  */ 
+	     SENIOR_TIM->CR1 &= (uint16_t)~TIM_CR1_CEN;
+       count=-1;
+		}	 
+		count++; 
+		TIM_ClearITPendingBit(SENIOR_TIM, TIM_IT_Update); //清除 TIM2 更新中断标志
+	 // printf("time2");
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
+   }
+}

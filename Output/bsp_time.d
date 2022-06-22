@@ -39,3 +39,5 @@
 ..\..\output\bsp_time.o: ..\..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_ltdc.h
 ..\..\output\bsp_time.o: ..\..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_sai.h
 ..\..\output\bsp_time.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
+..\..\output\bsp_time.o: ..\..\User\./usart/bsp_debug_usart.h
+..\..\output\bsp_time.o: ..\..\User\./HadamardOutput/bsp_dma_gpio.h

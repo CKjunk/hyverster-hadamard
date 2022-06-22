@@ -17,65 +17,58 @@ Library Manager: ArmAr.exe V5.06 update 6 (build 750)
 Hex Converter:   FromElf.exe V5.06 update 6 (build 750)
 CPU DLL:         SARMCM3.DLL V5.29.0.0
 Dialog DLL:      DCM.DLL V1.17.3.0
-Target DLL:      CMSIS_AGDI.dll V1.32.0.0
+Target DLL:      STLink\ST-LINKIII-KEIL_SWO.dll V3.0.7.0
 Dialog DLL:      TCM.DLL V1.36.5.0
  
 <h2>Project:</h2>
-E:\u盘\stm32\f429\F429标准库例程\1-书籍配套例程-F429IG-V1V2\30-ADC电压采集\F429_V1\ADC—独立模式-单通道-中断\Project\RVMDK（uv5）\BH-F429.uvprojx
-Project File Date:  05/22/2022
+E:\u盘\stm32\f429\F429标准库例程\1-书籍配套例程-F429IG-V1V2\30-ADC电压采集\F429_V1\HT-IMS\Project\RVMDK（uv5）\BH-F429.uvprojx
+Project File Date:  06/09/2022
 
 <h2>Output:</h2>
 *** Using Compiler 'V5.06 update 6 (build 750)', folder: 'C:\Keil_v5\ARM\ARMCC\Bin'
 Build target 'ADC-单通道-中断'
+compiling main.c...
+..\..\User\./sequence/sequence.h(48): warning:  #1-D: last line of file ends without a newline
+  #endif
+..\..\User\./time/bsp_time.h(43): warning:  #1-D: last line of file ends without a newline
+  #endif 
+..\..\User\./adc_dma/adc_dma.h(19): warning:  #1-D: last line of file ends without a newline
+   
+..\..\User\./usart_dma/usart_dma.h(18): warning:  #1-D: last line of file ends without a newline
+  #endif 
+..\..\User\./HadamardOutput/bsp_dma_gpio.h(6): warning:  #47-D: incompatible redefinition of macro "HADAMARD_BUFFSIZE"  (declared at line 5 of "..\..\User\./adc/bsp_adc.h")
+  #define HADAMARD_BUFFSIZE 			1027
+..\..\User\./HadamardOutput/bsp_dma_gpio.h(31): warning:  #1-D: last line of file ends without a newline
+  #endif 
+..\..\User\main.c: 6 warnings, 0 errors
 compiling bsp_time.c...
-..\..\User\./time/bsp_time.h(58): warning:  #1-D: last line of file ends without a newline
+..\..\User\./time/bsp_time.h(43): warning:  #1-D: last line of file ends without a newline
   #endif 
-..\..\User\time\bsp_time.c(8): error:  #20: identifier "ADVANCE_OCPWM_GPIO_CLK" is undefined
-      RCC_AHB1PeriphClockCmd (ADVANCE_OCPWM_GPIO_CLK  |
-..\..\User\time\bsp_time.c(9): error:  #20: identifier "ADVANCE_OCNPWM_GPIO_CLK" is undefined
-                              ADVANCE_OCNPWM_GPIO_CLK |
-..\..\User\time\bsp_time.c(10): error:  #20: identifier "ADVANCE_BKIN_GPIO_CLK" is undefined
-                              ADVANCE_BKIN_GPIO_CLK,
-..\..\User\time\bsp_time.c(13): error:  #20: identifier "ADVANCE_OCPWM_GPIO_PORT" is undefined
-      GPIO_PinAFConfig(ADVANCE_OCPWM_GPIO_PORT,
-..\..\User\time\bsp_time.c(14): error:  #20: identifier "ADVANCE_OCPWM_PINSOURCE" is undefined
-                      ADVANCE_OCPWM_PINSOURCE,
-..\..\User\time\bsp_time.c(15): error:  #20: identifier "ADVANCE_OCPWM_AF" is undefined
-                      ADVANCE_OCPWM_AF);
-..\..\User\time\bsp_time.c(16): error:  #20: identifier "ADVANCE_OCNPWM_GPIO_PORT" is undefined
-      GPIO_PinAFConfig(ADVANCE_OCNPWM_GPIO_PORT,
-..\..\User\time\bsp_time.c(17): error:  #20: identifier "ADVANCE_OCNPWM_PINSOURCE" is undefined
-                      ADVANCE_OCNPWM_PINSOURCE,
-..\..\User\time\bsp_time.c(18): error:  #20: identifier "ADVANCE_OCNPWM_AF" is undefined
-                      ADVANCE_OCNPWM_AF);
-..\..\User\time\bsp_time.c(19): error:  #20: identifier "ADVANCE_BKIN_GPIO_PORT" is undefined
-      GPIO_PinAFConfig(ADVANCE_BKIN_GPIO_PORT,
-..\..\User\time\bsp_time.c(20): error:  #20: identifier "ADVANCE_BKIN_PINSOURCE" is undefined
-                      ADVANCE_BKIN_PINSOURCE,
-..\..\User\time\bsp_time.c(21): error:  #20: identifier "ADVANCE_BKIN_AF" is undefined
-                      ADVANCE_BKIN_AF);
-..\..\User\time\bsp_time.c(24): error:  #20: identifier "ADVANCE_OCPWM_PIN" is undefined
-      GPIO_InitStructure.GPIO_Pin = ADVANCE_OCPWM_PIN;
-..\..\User\time\bsp_time.c(31): error:  #20: identifier "ADVANCE_OCNPWM_PIN" is undefined
-      GPIO_InitStructure.GPIO_Pin = ADVANCE_OCNPWM_PIN;
-..\..\User\time\bsp_time.c(34): error:  #20: identifier "ADVANCE_BKIN_PIN" is undefined
-      GPIO_InitStructure.GPIO_Pin = ADVANCE_BKIN_PIN;
-..\..\User\time\bsp_time.c(60): error:  #20: identifier "ADVANCE_TIM" is undefined
-      TIM_TimeBaseInit(ADVANCE_TIM, &TIM_TimeBaseStructure);
-..\..\User\time\bsp_time.c(70): error:  #20: identifier "ChannelPulse" is undefined
-      TIM_OCInitStructure.TIM_Pulse = ChannelPulse;
-..\..\User\time\bsp_time.c(103): warning:  #1-D: last line of file ends without a newline
-  }
-..\..\User\time\bsp_time.c(2): warning:  #177-D: function "TIMx_GPIO_Config"  was declared but never referenced
-  static void TIMx_GPIO_Config(void)
-..\..\User\time\bsp_time.c(38): warning:  #177-D: function "TIM_Mode_Config"  was declared but never referenced
-  static void TIM_Mode_Config(void)
-..\..\User\time\bsp_time.c: 4 warnings, 17 errors
+..\..\User\./HadamardOutput/bsp_dma_gpio.h(31): warning:  #1-D: last line of file ends without a newline
+  #endif 
+..\..\User\time\bsp_time.c(138): warning:  #1-D: last line of file ends without a newline
+   
+..\..\User\time\bsp_time.c: 3 warnings, 0 errors
 compiling stm32f4xx_it.c...
-..\..\User\./time/bsp_time.h(58): warning:  #1-D: last line of file ends without a newline
+..\..\User\./time/bsp_time.h(43): warning:  #1-D: last line of file ends without a newline
   #endif 
-..\..\User\stm32f4xx_it.c: 1 warning, 0 errors
-"..\..\Output\ADC-单通道-中断.axf" - 17 Error(s), 5 Warning(s).
+..\..\User\./adc_dma/adc_dma.h(19): warning:  #1-D: last line of file ends without a newline
+   
+..\..\User\./usart_dma/usart_dma.h(18): warning:  #1-D: last line of file ends without a newline
+  #endif 
+..\..\User\./HadamardOutput/bsp_dma_gpio.h(6): warning:  #47-D: incompatible redefinition of macro "HADAMARD_BUFFSIZE"  (declared at line 5 of "..\..\User\./adc/bsp_adc.h")
+  #define HADAMARD_BUFFSIZE 			1027
+..\..\User\./HadamardOutput/bsp_dma_gpio.h(31): warning:  #1-D: last line of file ends without a newline
+  #endif 
+..\..\User\./sequence/sequence.h(48): warning:  #1-D: last line of file ends without a newline
+  #endif
+..\..\User\stm32f4xx_it.c(77): warning:  #68-D: integer conversion resulted in a change of sign
+         count=-1;
+..\..\User\stm32f4xx_it.c: 7 warnings, 0 errors
+linking...
+Program Size: Code=10340 RO-data=604 RW-data=208 ZI-data=57672  
+FromELF: creating hex file...
+"..\..\Output\ADC-单通道-中断.axf" - 0 Error(s), 16 Warning(s).
 
 <h2>Software Packages used:</h2>
 
@@ -89,8 +82,7 @@ Package Vendor: Keil
   C:\Users\15151\AppData\Local\Arm\Packs\Keil\STM32F4xx_DFP\1.0.8\Device\Include
 
 <h2>Collection of Component Files used:</h2>
-Target not created.
-Build Time Elapsed:  00:00:03
+Build Time Elapsed:  00:00:01
 </pre>
 </body>
 </html>
