@@ -43,7 +43,7 @@
 ..\..\output\main.o: ..\..\User\./sequence/sequence.h
 ..\..\output\main.o: ..\..\User\./time/bsp_time.h
 ..\..\output\main.o: ..\..\User\./key/key.h
-..\..\output\main.o: ..\..\User\./adc_dma/adc_dma.h
 ..\..\output\main.o: ..\..\User\./led/bsp_led.h
 ..\..\output\main.o: ..\..\User\./usart_dma/usart_dma.h
 ..\..\output\main.o: ..\..\User\./HadamardOutput/bsp_dma_gpio.h
+..\..\output\main.o: ..\..\User\./systick/bsp_SysTick.h

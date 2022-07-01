@@ -121,6 +121,9 @@ void TIM8_ADC_Config(u16 arr,u16 psc,u16 adc_pwm_lowtime ){
 		NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE; //IRQ通道被使能
 		NVIC_Init(&NVIC_InitStructure);  //初始化NVIC寄存器
 		
+		
+	//	TIM_ITConfig(TIM_ADC1,TIM_IT_Update,ENABLE); //使能指定的TIM2中断,允许更新中断
+
 	  TIM_DMACmd(TIM_ADC1, TIM_DMA_Update, ENABLE);  //定时器更新事件触发DMA传输
 
 	  TIM_ClearFlag(TIM_ADC1, TIM_FLAG_Update);

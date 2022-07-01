@@ -338,7 +338,7 @@
               <MiscControls></MiscControls>
               <Define>USE_STDPERIPH_DRIVER,STM32F429_439xx,</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\Libraries\CMSIS\Device\ST\STM32F4xx\Include;..\..\Libraries\STM32F4xx_StdPeriph_Driver\inc;..\..\User;..\..\Libraries\CMSIS\Include;..\..\User\time;..\..\User\sequence;..\..\User\key;..\..\User\usart_dma;..\..\User\led;..\..\User\usart;..\..\User\HadamardOutput;..\..\User\adc</IncludePath>
+              <IncludePath>..\..\Libraries\CMSIS\Device\ST\STM32F4xx\Include;..\..\Libraries\STM32F4xx_StdPeriph_Driver\inc;..\..\User;..\..\Libraries\CMSIS\Include;..\..\User\time;..\..\User\sequence;..\..\User\key;..\..\User\usart_dma;..\..\User\led;..\..\User\usart;..\..\User\HadamardOutput;..\..\User\adc;..\..\User\systick</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -697,6 +697,11 @@
               <FileName>bsp_adc.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\User\adc\bsp_adc.c</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_SysTick.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\systick\bsp_SysTick.c</FilePath>
             </File>
           </Files>
         </Group>

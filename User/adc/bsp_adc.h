@@ -22,9 +22,9 @@
 #define RHEOSTAT_ADC_DMA_CHANNEL  DMA_Channel_0
 #define RHEOSTAT_ADC_DMA_STREAM   DMA2_Stream0
 
-#define DMA_ADC_COMP_INT_CHANNEL     DMA2_Stream0_IRQn
+#define DMA_ADC_COMP_INT_CHANNEL  DMA2_Stream0_IRQn
 
-#define DMA_ADC_COMP_INT_FUNCTION    DMA2_Stream0_IRQHandler
+#define DMA_ADC_COMP_INT_FUNCTION DMA2_Stream0_IRQHandler
 void Rheostat_Init(void);
 
 #endif /* __BSP_ADC_H */

@@ -47,3 +47,4 @@
 ..\..\output\stm32f4xx_it.o: ..\..\User\./usart_dma/usart_dma.h
 ..\..\output\stm32f4xx_it.o: ..\..\User\./HadamardOutput/bsp_dma_gpio.h
 ..\..\output\stm32f4xx_it.o: ..\..\User\./sequence/sequence.h
+..\..\output\stm32f4xx_it.o: ..\..\User\./systick/bsp_SysTick.h

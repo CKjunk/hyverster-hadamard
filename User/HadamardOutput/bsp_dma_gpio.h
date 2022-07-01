@@ -3,8 +3,7 @@
 
 #include "stm32f4xx.h"
  // ADC GPIO ∫Í∂®“Â
-#define HADAMARD_BUFFSIZE 			1027
- 
+  
 #define HADAMARD_GPIO_PORT                     GPIOA
 #define HADAMARD_GPIO_PIN                      GPIO_Pin_8
 #define HADAMARD_PWM_PINSOURCE                 GPIO_PinSource8

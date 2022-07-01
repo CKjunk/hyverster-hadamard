@@ -4,16 +4,17 @@
 #include "./sequence/sequence.h"
 #include "./time/bsp_time.h"
 #include "./key/key.h"
-#include "./adc_dma/adc_dma.h"
-#include "./led/bsp_led.h"  
+ #include "./led/bsp_led.h"  
 #include "./usart_dma/usart_dma.h"
 #include "./HadamardOutput/bsp_dma_gpio.h"
+#include "./systick/bsp_SysTick.h"
+
 // ADC转换的电压值通过DMA方式传到SRAM
 extern uint16_t HT_IMS_ADC_ConvertedValue[HADAMARD_BUFFSIZE];
 u8 display_flag = 0;
 extern u8 array[HADAMARD_BUFFSIZE];
 u16 count = 0;  	 
-
+u16 frame_count = 1;
  
 FOUR four = {0,NULL};
 FOUR* pfour = &four;
@@ -36,31 +37,32 @@ int array_thirteen[13] = {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1};
 int main(void)
 {	
 	  pten = TenOrder_Sequence(array_ten,pten);
+	  SysTick_Init();
   //pfour = FourOrder_Sequence(array_four,pfour);  
-	  EXTI_Key_Config();
-	  Debug_USART_Config();
-    Rheostat_Init();
-	  TIM1_GPIO_Config(PERIOD,SENIOR_PSC,PERIOD+1);
-    TIM8_ADC_Config(PERIOD,SENIOR_PSC,PULSE_WIDTH); 
+	  EXTI_Key_Config(); //按键初始化
+	  Debug_USART_Config();//串口初始化
+    Rheostat_Init();//adc初始化
+	  TIM1_GPIO_Config(SEQUENCE_PERIOD,SENIOR_PSC,SEQUENCE_PERIOD+1);//序列时钟初始化
+    TIM8_ADC_Config(TIM_ADC1_PERIOD,SENIOR_PSC,TIM_ADC1_LOWTIME);//adc时钟初始化
     while (1){
 	 
-			if(display_flag == 1){
-//				for(int i = 0;i < HADAMARD_BUFFSIZE;i++){ 
-//					  printf("%f\r\n",(float)HT_IMS_ADC_ConvertedValue[i]/4096*(float)3.3);				 
-//				}
-					for(int i = 0;i < HADAMARD_BUFFSIZE;i++){ 
-					  printf("%d\r\n",HT_IMS_ADC_ConvertedValue[i]);				 
+			if(display_flag == 1){ //表示一轮已经采集完
+ 
+ 					for(int i = 0;i < HADAMARD_BUFFSIZE;i++){ //数据上传到上位机
+					  printf("%d\r\n",HT_IMS_ADC_ConvertedValue[i]);	
+						HT_IMS_ADC_ConvertedValue[i] = 0; //传完之后将对应位清零
 				 }
-				for(int i = 0;i < HADAMARD_BUFFSIZE;i++){ 
-              HT_IMS_ADC_ConvertedValue[i] = 0;
-				}
-          display_flag = 0;
+ 			   RHEOSTAT_ADC_DMA_STREAM->NDTR = HADAMARD_BUFFSIZE; //重新装填DMA需要传输的数据个数
+			   DMA_Cmd(RHEOSTAT_ADC_DMA_STREAM, ENABLE);          //先使能DMA通道
+			   RHEOSTAT_ADC->SR &=~(0X01<<5);   //将由硬件置1的ADC状态寄存器的溢出标志位清除，不然容易出错
+         TIM1_GPIO_Config(SEQUENCE_PERIOD,SENIOR_PSC,SEQUENCE_PERIOD+1);//序列时钟初始化
+         TIM8_ADC_Config(TIM_ADC1_PERIOD,SENIOR_PSC,TIM_ADC1_LOWTIME);//adc时钟初始化
+         display_flag = 0;
+				 frame_count++;
 			}
-			  RHEOSTAT_ADC_DMA_STREAM->NDTR = HADAMARD_BUFFSIZE;                 //重新装填DMA需要传输的数据个数
-        DMA_Cmd(RHEOSTAT_ADC_DMA_STREAM, ENABLE);          //先使能DMA通道
-        RHEOSTAT_ADC->SR &=~(0X01<<5);                         //将由硬件置1的ADC状态寄存器的溢出标志位清除，不然容易出错
-        ADC_DMACmd(RHEOSTAT_ADC,ENABLE);                 //再使能ADC的DMA传输    
-   }
+	 
+
+		}
 }
 
 

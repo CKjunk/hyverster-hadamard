@@ -1,6 +1,5 @@
 #include "./adc/bsp_adc.h"
 uint16_t HT_IMS_ADC_ConvertedValue[HADAMARD_BUFFSIZE] = {0};
-  
 static void Rheostat_ADC_GPIO_Config(void)
 {
 	GPIO_InitTypeDef GPIO_InitStructure;

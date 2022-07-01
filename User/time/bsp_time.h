@@ -3,15 +3,16 @@
 //注意一下，周期比实际值小一，分频系数比实际减一，宽度就是实际值
 #include "stm32f4xx.h"
 #include <stdio.h>
-#define PERIOD 400-1  //实际周期为PWM_PERIOD
-
-#define TIM_ADC1_LOWTIME 400-1
 #define SENIOR_PSC  180-1  
 #define COMMON_PSC  90-1 //// 通用控制定时器时钟源TIMxCLK = HCLK/2=90MHz 
 
-#define PULSE_PERIOD   400-1
-#define PULSE_WIDTH    200
- 
+#define OVERSAMPLING 8 
+#define TIM_ADC1_PERIOD 200-1  //实际周期为PWM_PERIOD
+#define TIM_ADC1_LOWTIME 100
+
+
+#define SEQUENCE_PERIOD   200-1
+  
 #define SENIOR_TIM                   TIM1
 #define SENIOR_TIM_CLK               RCC_APB2Periph_TIM1
 #define SENIOR_TIM_INT_FUNCTION      TIM1_UP_TIM10_IRQHandler
