@@ -2,7 +2,6 @@
 #define	__BSP_ADC_H
 
 #include "stm32f4xx.h"
-#define HADAMARD_BUFFSIZE   1026
 #define H_TOTAL_FRAME  10
 // ADC GPIO ∫Í∂®“Â
 #define RHEOSTAT_ADC_GPIO_PORT    GPIOC
@@ -25,7 +24,7 @@
 #define DMA_ADC_COMP_INT_CHANNEL  DMA2_Stream0_IRQn
 
 #define DMA_ADC_COMP_INT_FUNCTION DMA2_Stream0_IRQHandler
-void Rheostat_Init(void);
+void Rheostat_Init();
 
 #endif /* __BSP_ADC_H */
 

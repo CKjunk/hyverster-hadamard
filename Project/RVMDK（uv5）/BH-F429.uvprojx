@@ -703,6 +703,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\User\systick\bsp_SysTick.c</FilePath>
             </File>
+            <File>
+              <FileName>usart_dma.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\usart_dma\usart_dma.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

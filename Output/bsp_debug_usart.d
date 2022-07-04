@@ -1,5 +1,5 @@
 ..\..\output\bsp_debug_usart.o: ..\..\User\usart\bsp_debug_usart.c
-..\..\output\bsp_debug_usart.o: ..\..\User\./usart/bsp_debug_usart.h
+..\..\output\bsp_debug_usart.o: ..\..\User\./usart_dma/usart_dma.h
 ..\..\output\bsp_debug_usart.o: ..\..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h
 ..\..\output\bsp_debug_usart.o: ..\..\Libraries\CMSIS\Include\core_cm4.h
 ..\..\output\bsp_debug_usart.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
@@ -39,3 +39,4 @@
 ..\..\output\bsp_debug_usart.o: ..\..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_ltdc.h
 ..\..\output\bsp_debug_usart.o: ..\..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_sai.h
 ..\..\output\bsp_debug_usart.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
+..\..\output\bsp_debug_usart.o: ..\..\User\./usart/bsp_debug_usart.h

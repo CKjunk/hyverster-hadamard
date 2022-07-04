@@ -39,3 +39,5 @@
 ..\..\output\usart_dma.o: ..\..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_ltdc.h
 ..\..\output\usart_dma.o: ..\..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_sai.h
 ..\..\output\usart_dma.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
+..\..\output\usart_dma.o: ..\..\User\./usart/bsp_debug_usart.h
+..\..\output\usart_dma.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h

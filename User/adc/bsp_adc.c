@@ -1,5 +1,7 @@
 #include "./adc/bsp_adc.h"
-uint16_t HT_IMS_ADC_ConvertedValue[HADAMARD_BUFFSIZE] = {0};
+//uint16_t  HT_IMS_ADC_ConvertedValue[1026];
+volatile uint16_t*  HT_IMS_ADC_ConvertedValue;
+volatile int buffsize = 0;
 static void Rheostat_ADC_GPIO_Config(void)
 {
 	GPIO_InitTypeDef GPIO_InitStructure;
@@ -12,7 +14,7 @@ static void Rheostat_ADC_GPIO_Config(void)
 	GPIO_Init(RHEOSTAT_ADC_GPIO_PORT, &GPIO_InitStructure);		
 }
 
-static void Rheostat_ADC_Mode_Config(void)
+static void Rheostat_ADC_Mode_Config()  //注意这个buffsize只有在程序运行的时候才能确定
 {
 	DMA_InitTypeDef DMA_InitStructure;
 	ADC_InitTypeDef ADC_InitStructure;
@@ -31,7 +33,7 @@ static void Rheostat_ADC_Mode_Config(void)
   // 数据传输方向为外设到存储器	
 	DMA_InitStructure.DMA_DIR = DMA_DIR_PeripheralToMemory;	
 	// 缓冲区大小为，指一次传输的数据量
-	DMA_InitStructure.DMA_BufferSize = HADAMARD_BUFFSIZE;	
+	DMA_InitStructure.DMA_BufferSize = buffsize;	
 	// 外设寄存器只有一个，地址不用递增
 	DMA_InitStructure.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
   // 存储器地址固定
@@ -41,7 +43,7 @@ static void Rheostat_ADC_Mode_Config(void)
   //	存储器数据大小也为半字，跟外设数据大小相同
 	DMA_InitStructure.DMA_MemoryDataSize = DMA_MemoryDataSize_HalfWord;	
 	// 循环传输模式
-	DMA_InitStructure.DMA_Mode = DMA_Mode_Normal;
+	DMA_InitStructure.DMA_Mode = DMA_Mode_Circular;
   // DMA 传输通道优先级为高，当使用一个DMA通道时，优先级设置不影响
 	DMA_InitStructure.DMA_Priority = DMA_Priority_High;
   // 禁止DMA FIFO	，使用直连模式
@@ -113,7 +115,7 @@ static void Rheostat_ADC_Mode_Config(void)
   //开始adc转换，软件触发
 }
 
-void Rheostat_Init(void)
+void Rheostat_Init(int buffsize)
 {
 	Rheostat_ADC_GPIO_Config();
 	Rheostat_ADC_Mode_Config();

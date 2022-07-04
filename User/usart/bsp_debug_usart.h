@@ -3,7 +3,7 @@
 
 #include "stm32f4xx.h"
 #include <stdio.h>
-
+#define USE_USART_DMA_RX 1
 
 //Òý½Å¶¨Òå
 /*******************************************************/

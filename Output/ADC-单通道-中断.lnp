@@ -49,6 +49,7 @@
 "..\..\output\bsp_led.o"
 "..\..\output\bsp_adc.o"
 "..\..\output\bsp_systick.o"
+"..\..\output\usart_dma.o"
 --library_type=microlib --strict --scatter "..\..\Output\ADC-单通道-中断.sct"
 --summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
 --info sizes --info totals --info unused --info veneers

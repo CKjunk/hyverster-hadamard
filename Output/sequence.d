@@ -41,3 +41,4 @@
 ..\..\output\sequence.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
 ..\..\output\sequence.o: ..\..\User\./usart/bsp_debug_usart.h
 ..\..\output\sequence.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
+..\..\output\sequence.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h

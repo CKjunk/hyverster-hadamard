@@ -47,3 +47,5 @@
 ..\..\output\main.o: ..\..\User\./usart_dma/usart_dma.h
 ..\..\output\main.o: ..\..\User\./HadamardOutput/bsp_dma_gpio.h
 ..\..\output\main.o: ..\..\User\./systick/bsp_SysTick.h
+..\..\output\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
+..\..\output\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h

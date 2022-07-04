@@ -1,3 +1,4 @@
+#include "./usart_dma/usart_dma.h"
 
 #include "./usart/bsp_debug_usart.h"
  /**
@@ -5,7 +6,6 @@
   * @param  无
   * @retval 无
   */
-	
 static void NVIC_Configuration(void)
 {
   NVIC_InitTypeDef NVIC_InitStructure;
@@ -75,8 +75,17 @@ void Debug_USART_Config(void)
 	NVIC_Configuration();
   
 	/* 使能串口接收中断 */
-	USART_ITConfig(DEBUG_USART, USART_IT_RXNE, ENABLE);
-  /* 使能串口 */
+#if USE_USART_DMA_RX 
+	// 开启 串口空闲IDEL 中断
+	USART_ITConfig(DEBUG_USART, USART_IT_IDLE, ENABLE);  
+ 	/* 使能串口DMA */
+	USART_DMA_Config();
+#else
+	// 使能串口接收中断
+	USART_ITConfig(DEBUG_USART, USART_IT_RXNE, ENABLE);	
+#endif
+
+   /* 使能串口 */
   USART_Cmd(DEBUG_USART, ENABLE);
 }
 
