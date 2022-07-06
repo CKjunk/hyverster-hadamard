@@ -1,7 +1,7 @@
 #include "./adc/bsp_adc.h"
 //uint16_t  HT_IMS_ADC_ConvertedValue[1026];
-volatile uint16_t*  HT_IMS_ADC_ConvertedValue;
-volatile int buffsize = 0;
+volatile  uint16_t*  HT_IMS_ADC_ConvertedValue;
+
 static void Rheostat_ADC_GPIO_Config(void)
 {
 	GPIO_InitTypeDef GPIO_InitStructure;
@@ -14,7 +14,7 @@ static void Rheostat_ADC_GPIO_Config(void)
 	GPIO_Init(RHEOSTAT_ADC_GPIO_PORT, &GPIO_InitStructure);		
 }
 
-static void Rheostat_ADC_Mode_Config()  //注意这个buffsize只有在程序运行的时候才能确定
+static void Rheostat_ADC_Mode_Config(int buffsize)  //注意这个buffsize只有在程序运行的时候才能确定
 {
 	DMA_InitTypeDef DMA_InitStructure;
 	ADC_InitTypeDef ADC_InitStructure;
@@ -43,7 +43,7 @@ static void Rheostat_ADC_Mode_Config()  //注意这个buffsize只有在程序运行的时候才
   //	存储器数据大小也为半字，跟外设数据大小相同
 	DMA_InitStructure.DMA_MemoryDataSize = DMA_MemoryDataSize_HalfWord;	
 	// 循环传输模式
-	DMA_InitStructure.DMA_Mode = DMA_Mode_Circular;
+	DMA_InitStructure.DMA_Mode = DMA_Mode_Normal;
   // DMA 传输通道优先级为高，当使用一个DMA通道时，优先级设置不影响
 	DMA_InitStructure.DMA_Priority = DMA_Priority_High;
   // 禁止DMA FIFO	，使用直连模式
@@ -115,8 +115,7 @@ static void Rheostat_ADC_Mode_Config()  //注意这个buffsize只有在程序运行的时候才
   //开始adc转换，软件触发
 }
 
-void Rheostat_Init(int buffsize)
-{
+void ADCX_Init(int buffsize){
 	Rheostat_ADC_GPIO_Config();
-	Rheostat_ADC_Mode_Config();
+	Rheostat_ADC_Mode_Config(buffsize);
 }

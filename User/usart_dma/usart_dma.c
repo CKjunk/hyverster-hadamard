@@ -1,7 +1,6 @@
 #include "./usart_dma/usart_dma.h"
 #include "./usart/bsp_debug_usart.h"
 #include "stdlib.h"
-volatile char Usart_Rx_Buf[USART_BUFF_SIZE];  //用作接收上位机传输的命令字符串
 
  void USART_DMA_Config(void)
 {
@@ -22,7 +21,7 @@ volatile char Usart_Rx_Buf[USART_BUFF_SIZE];  //用作接收上位机传输的命令字符串
   /*设置DMA源：串口数据寄存器地址*/
   DMA_InitStructure.DMA_PeripheralBaseAddr = DEBUG_USART_DR_BASE;	 
   /*内存地址(要传输的变量的指针)*/
-  DMA_InitStructure.DMA_Memory0BaseAddr = (u32)Usart_Rx_Buf;
+//  DMA_InitStructure.DMA_Memory0BaseAddr = (u32)Usart_Rx_Buf;
   /*方向：从内存到外设*/		
   DMA_InitStructure.DMA_DIR = DMA_DIR_PeripheralToMemory;	
   /*传输大小DMA_BufferSize=RECEIVEBUFF_SIZE*/	

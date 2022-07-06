@@ -26,7 +26,7 @@
 
    此函数可用来产生S序列
 */
-u8* createSequence(int initial[],int initNumber){
+u8* createSequence(u8 initial[],u8 initNumber){
 
     int len = pow(2,initNumber)-1; 
     u8* seq = (u8*)malloc(len*sizeof(u8));
@@ -66,6 +66,14 @@ u8* createSequence(int initial[],int initNumber){
 			}
       registers[1] = first_element;	  
 	 } 
+//		free(registers);
+//	 	free(onePosition);
+
+	 printf("createSequence function:\r\n");
+	 for(int i = 0;i < len;i++){
+	  printf("%d ",seq[i]);
+	 }
+	 printf("\r\n");
    return seq;
 
 }
