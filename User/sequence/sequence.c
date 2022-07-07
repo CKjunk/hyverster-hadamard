@@ -69,11 +69,11 @@ u8* createSequence(u8 initial[],u8 initNumber){
 //		free(registers);
 //	 	free(onePosition);
 
-	 printf("createSequence function:\r\n");
-	 for(int i = 0;i < len;i++){
-	  printf("%d ",seq[i]);
-	 }
-	 printf("\r\n");
+//	 printf("createSequence function:\r\n");
+//	 for(int i = 0;i < len;i++){
+//	  printf("%d ",seq[i]);
+//	 }
+//	 printf("\r\n");
    return seq;
 
 }

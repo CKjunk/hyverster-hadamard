@@ -36,6 +36,8 @@ void TOTAL_PROJECT_INT_FUNCTION(void){
 void DMA_ADC_COMP_INT_FUNCTION(void){
     if(DMA_GetITStatus(RHEOSTAT_ADC_DMA_STREAM,DMA_IT_TCIF0))
 	  {
+		  TIM_ADC1->CR1 &= (uint16_t)~TIM_CR1_CEN; //adc的时钟disable
+		//printf("adc cpmplete\r\n");
 			frame_count++;
 			flag = 2;
  			DMA_Cmd(RHEOSTAT_ADC_DMA_STREAM, DISABLE);          //先使能DMA通道
@@ -60,7 +62,6 @@ void SENIOR_TIM_INT_FUNCTION(void){
 			  SENIOR_TIM->CCR1  =  SEQUENCE_PERIOD+1;
      }
 		if(sequenceCount == sequenceLength+1){
-		   TIM_ADC1->CR1 &= (uint16_t)~TIM_CR1_CEN; //adc的时钟disable
        SENIOR_TIM->CR1 &= (uint16_t)~TIM_CR1_CEN;//序列的时钟disable
  			 sequenceCount = -1;
 
@@ -92,7 +93,10 @@ void DEBUG_USART_1_IRQHandler(void)
     if(USART_GetITStatus(DEBUG_USART_1, USART_IT_RXNE) != RESET)//接收到一个字节，进入一次接收中断  
     {           
 
-        Usart_Rx_Buf[recSize++] = DEBUG_USART_1->DR; //将接收的数据存入rx_buff中  
+        Usart_Rx_Buf[recSize++] = DEBUG_USART_1->DR; //将接收的数据存入rx_buff中 
+//			  if(Usart_Rx_Buf[0] == 's'){
+//			         flag = 1;
+//			}
     }   
   
     if(USART_GetITStatus(DEBUG_USART_1, USART_IT_IDLE) != RESET)//接收完数据后进入空闲中断  
