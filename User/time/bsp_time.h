@@ -41,4 +41,5 @@
 void TIM1_GPIO_Config(u16 arr,u16 psc,u16 adc_pwm_lowtime);
   
 void TIM8_ADC_Config(u16 arr,u16 psc,u16 adc_pwm_lowtime);
-#endif 
+#endif
+

@@ -10,210 +10,355 @@
 #include "./systick/bsp_SysTick.h"
 #include "stdlib.h"
 #include "math.h"
-//#define SENIOR_PSC  180-1  
-//#define COMMON_PSC  90-1 //// 通用控制定时器时钟源TIMxCLK = HCLK/2=90MHz 
-//#define OVERSAMPLING 8 
-//#define TIM_ADC1_PERIOD 200-1  //实际周期为PWM_PERIOD
-//#define TIM_ADC1_LOWTIME 100
-//#define SEQUENCE_PERIOD  200-1
-int overSampling = 1;  //过采样系数
-int timAdcPeriod = 200;  //过采样系数为1的时候的adc定时器周期
-int adcLowTime = 0;      //定时器一个周期内低电平持续时间
-void show_Usart_Rx_Buf();
-void initialSequence();
-void beginSample();
-void clear_Usart_Rx_Buf();
-void show_Sequence();
-void show_coef();
+#include "arm_math.h"
+#include "hadamard.h"
+#define HADAMARDORDER 128
+int numberOfZero = 0;
+
+int averageNumber = 40;
+
+int AdcPeriod = 200-1;  //过采样系数为1的时候的adc定时器周期
+int AdcLowTime = 100;    //定时器一个周期内低电平持续时间
+int sequencePeriod = 200 - 1;  //过采样系数为1的时候的adc定时器周期
+int sequenceLowTime = 200;      //定时器一个周期内低电平持续时间
+void showSendSequence(u8* sendSuenquence,int length);
+void beginSample(int number);
+void showHadamard(MatrixElementType *pHadamard,int hadamardOrder);
 void DEBUG_USART_2_Send_Array(uint16_t send_array[],int number);
-u8* createInitialCoef(char Usart_Rx_Buf[],u8* orderLength);
-char Usart_Rx_Buf[20];  //用作接收上位机传输的命令字符串
-int firstSample = 1;
-extern  uint16_t* HT_IMS_ADC_ConvertedValue;// ADC转换的电压值通过DMA方式传到SRAM
-int recSize = 0;  //接收的命令大小
-int flag = 0;  //总的flag
+void sendOverlap(MatrixElementType*pOverlapSignal,int hadamardOrder,int row);
+void getOverlopSignal(uint16_t*HT_IMS_ADC_ConvertedValue,MatrixElementType *pOverlapSignal,int hadamardOrder,int framecount);
+void showOriginalValue(uint16_t*HT_IMS_ADC_ConvertedValue, int hadamardOrder);
+void getAverageSignal(MatrixElementType*pRecoverySignal,MatrixElementType* pAverageResult ,int hadamardOrder,int averageNumber);
+void showRecoverySignal(MatrixElementType* array, int hadamardOrder);
+void arraycircShift(MatrixElementType* array,int length,int shiftNumber);
+void showResultSignal(MatrixElementType* array, int hadamardOrder);
+void productSendSequence(MatrixElementType* pPrbs,u8* sendSuenquence,int frameCount,int sequenceLength);
+
+
+int sequenceLength = HADAMARDORDER-1;
+
+extern uint16_t* HT_IMS_ADC_ConvertedValue;
+
+u8* sendSequence = NULL;
+
+int overSampling = 1;  //过采样系数
+ 
+
+  
+int frameCount = 0;
+int flag = 10;  //总的flag
 int sequenceCount = 0;  	 //发送的序列计数
-volatile int frame_count = 0;  //帧数计数
-u8 orderLength = 0;  //
-u8* porderLength = &orderLength; //系数序列长度
-volatile int  sequenceLength = 0;
-volatile int* psequenceLength = &sequenceLength;//s序列长度
-volatile int buffsize = 0;   //记录adc开辟的数组大小
-u8* coef;    //上位机发过来的序列首地址
-u8* sequenceProduct;
-volatile u8 initialNumber = 0;
+int initialNumber = 0;
+int  adcSequenceCount = 0;
+int  errorSample = 3;
+int  sampleSize = 0;
 int main(void)
-{	
- 	  SysTick_Init();
+{		
+		SysTick_Init();
  	  EXTI_Key_Config(); //按键初始化
-	  Debug_USART_Config();//串口初始化
+	  Debug_USART_Config();//串口初
+ 	  float32_t scale = 1.0/HADAMARDORDER;
+    sampleSize = sequenceLength+1;
+    volatile int frame_count = 0;  //帧数计数
+	 	
+	
+	
+	  MatrixType  matrixPrbs;
+		MatrixType  matrixPrbsTemp;
+
+    MatrixType  matrixPrbsInverse; 
+	
+	  MatrixType  matrixRecoverySignal;  
+	  MatrixType  matrixValidateResult;  
+	
+	  MatrixType  matrixOverlapSignal;  
+	
+    MatrixType  matrixResult;
+
+    HT_IMS_ADC_ConvertedValue = (uint16_t*)malloc((sequenceLength + 2)* sizeof(uint16_t)); 
+	 	
+	
+	  MatrixElementType* pHadamard = NULL;
+	 
+  	MatrixElementType* pPrbs = NULL; 
+	   /*主要是用来*/
+    MatrixElementType* pPrbsTemp = NULL;  	
+	  /*显示PRBS逆矩阵序列*/
+	  MatrixElementType* pPrbsInverse = (MatrixElementType*)malloc(sequenceLength*sequenceLength * sizeof(MatrixElementType));
+    /*验证逆矩阵序列是否正确*/
+ 		MatrixElementType* pValidateResult = (MatrixElementType*)malloc(sequenceLength*sequenceLength* sizeof(MatrixElementType));//验证信号序列
+
+   	MatrixElementType* pOverlapSignal = (MatrixElementType*)malloc(sequenceLength*sequenceLength * sizeof(MatrixElementType)); //叠加信号序列
+    
+		MatrixElementType* pRecoverySignal = (MatrixElementType*)malloc(sequenceLength*sequenceLength * sizeof(MatrixElementType));//恢复信号序列
+    
+  	MatrixElementType* pAverageResult  = (MatrixElementType*)malloc(sequenceLength * sizeof(MatrixElementType));//验证信号序列
+	  
+		MatrixElementType* pResult = (MatrixElementType*)malloc(sequenceLength*sequenceLength*sizeof(MatrixElementType));//验证信号序列
+
+ 	  sendSequence = (u8*)malloc(sequenceLength * sizeof(u8));//哈达玛序列插零之后的序列
+	 
+    memset(pAverageResult,0,sizeof(MatrixElementType)*sequenceLength);
+		
+		memset(HT_IMS_ADC_ConvertedValue,0,sizeof(uint16_t)*(sequenceLength + 2));
+
+   	pHadamard = hadamard(HADAMARDORDER);
+ 		pPrbsTemp = prbs(pHadamard,HADAMARDORDER);
+		pPrbs = prbs(pHadamard,HADAMARDORDER);
+
+    /*显示HADAMARD序列*/
+	  //printf("hadamard\r\n");
+	 // showHadamard(pHadamard,HADAMARDORDER);//显示新序列
+		/*显示PRBS新序列*/
+		 		
+		// printf("pPrbs\r\n");
+    // showHadamard(pPrbs,sequenceLength);
+		
+		MatrixInit(&matrixPrbs,sequenceLength,sequenceLength,pPrbs);
+		
+    MatrixInit(&matrixPrbsTemp,sequenceLength,sequenceLength,pPrbsTemp);
+		
+		MatrixInit(&matrixPrbsInverse,sequenceLength,sequenceLength,pPrbsInverse);
+
+		MatrixInit(&matrixResult,sequenceLength,sequenceLength,pResult);
+		
+ 		MatrixInit(&matrixValidateResult,sequenceLength,sequenceLength,pValidateResult);
+		
+		MatrixInit(&matrixRecoverySignal,sequenceLength,sequenceLength,pRecoverySignal);
+		
+   	MatrixInit(&matrixOverlapSignal,sequenceLength,sequenceLength,pOverlapSignal);
+
+ 		 
+		MatrixInverse(&matrixPrbsTemp,&matrixPrbsInverse);
+    /*显示一下矩阵的逆*/
+    //showHadamard(pPrbsInverse,sequenceLength);
+	//	printf("pPrbs\r\n");
+   // showHadamard(pPrbs,sequenceLength);
+	  productSendSequence(pPrbs,sendSequence,1,sequenceLength);
+	 // showSendSequence(sendSequence,sequenceLength );
+    /*开始采一次样并把采样值抛掉*/
+ 	  beginSample(sampleSize);
     while (1){
 			
 		 switch(flag){
-			 case 1: //数据接收标志位
-				 flag = 10;
-			 //show_Usart_Rx_Buf();
-				 if(Usart_Rx_Buf[0] == 's'){
-				 //show_Sequence();
-					 beginSample(); //开始采集
-				 //printf("sequenceProduct address:%p\r\n",sequenceProduct);
-					 clear_Usart_Rx_Buf(); 
-					 recSize = 0;
-				 }
-				 else{
-						initialNumber++;  //初始化次数加一
-					//printf("initial number:%d\r\n",initialNumber);
-						initialSequence();//初始化
-						clear_Usart_Rx_Buf();
-						frame_count = 0;
-					//show_Sequence();
-					//printf("sequenceProduct address:%p,buffsize:%d\r\n",sequenceProduct,buffsize);
-						recSize = 0;
-				 }
-				break;
-			 case 2: //adc完成标志位
-				 //printf("initial number:%d\r\n",initialNumber);
-					flag = 10;
-				 //printf("after DMA_GetCurrDataCounter:%d sequenceCount :%d sequenceLength :%d\r\n",DMA_GetCurrDataCounter(RHEOSTAT_ADC_DMA_STREAM),sequenceCount,sequenceLength);
-					if(frame_count > 1&&initialNumber == 1){
-						//printf("display\r\n");
-							DEBUG_USART_2_Send_Array(HT_IMS_ADC_ConvertedValue,buffsize - overSampling);
-						//printf("sequenceCount:%d\r\n",sequenceCount);					
-						}
-					if(initialNumber>1){
-						 // printf("display\r\n");
-							DEBUG_USART_2_Send_Array(HT_IMS_ADC_ConvertedValue,buffsize );
-							//printf("sequenceCount:%d\r\n",sequenceCount);
-					}
-				//  DEBUG_USART_2_Send_Array(HT_IMS_ADC_ConvertedValue);
+			 case 0:
+        flag = 10;	
+			 // showHadamard(pPrbsTemp,sequenceLength);
+				productSendSequence(pPrbs,sendSequence,1,sequenceLength);
+			 // showHadamard(pPrbs,sequenceLength);
+			// printf("frameCount:%d\r\n",frameCount);
+			 //showSendSequence(sendSequence,sequenceLength );
+				//printf("sampleSize:%d\r\n",sampleSize);
+				beginSample(sampleSize);
+			  // Delay_ms(20);
+			 	// showOriginalValue(HT_IMS_ADC_ConvertedValue,(sequenceLength + 2));
 			 break;
-			}
-       //2000011a
-			 //20000001001a
-			 //200000000101a
-			 //2000001010011a
-			 //20000000011011a
- 		}
-  }
+			 /*数据接收标志位*/
+			 case 1: 
+				 
+			 break;
+			 /*adc完成标志位*/
+			 
+			 case 2:  
+				  // printf("adc complete\r\n");
+				   flag = 10;
+			 		 /*framecount为2时才代表第一次采样*/						 
+            frameCount++;
+			    // printf("frameCount:%d\r\n",frameCount);
+					 if(frameCount == 1){
+						 // printf("frameCount:%d\r\n",frameCount);
+					    //showOriginalValue(HT_IMS_ADC_ConvertedValue,sampleSize);
 
-u8* createInitialCoef(char Usart_Rx_Buf[],u8* orderLength){
-	 int count = 0;
-	 overSampling = Usart_Rx_Buf[0] - 48; //拿到第一位的倍频系数
-	 count++;
-   while(Usart_Rx_Buf[count]!='a'){
-	    count++;
-	 }
-    u8* coefinside = (u8*)malloc((count-1)*sizeof(u8));
-	 	memset(coefinside, 0, sizeof(u8));
-
-	  count = 1;
-    while(Usart_Rx_Buf[count]!='a'){
-			coefinside[count-1] = (int)Usart_Rx_Buf[count] - 48;
-	    count++;
-	 }
-		*orderLength = count-1;
-//   for(int i = 0;i < count - 1 ;i++){	 
-//	     printf("%d ",coefinside[i]);
-//	 }
-// 	     printf("\r\n");
-
- 	 return coefinside;
+					    
+					 }
+			     if(frameCount > 1&&frameCount <= sequenceLength){
+					//	printf("HT_IMS_ADC_ConvertedValue\r\n");
+						/*打印采的AD值*/						 
+					 // printf("frameCount:%d\r\n",frameCount-1);
+					//  showOriginalValue(HT_IMS_ADC_ConvertedValue,sampleSize);
+						/*去掉零时刻的值*/	
+						 getOverlopSignal(HT_IMS_ADC_ConvertedValue,pOverlapSignal,sequenceLength,frameCount);
+ 						 Delay_ms(5);
+  					 
+						 productSendSequence(pPrbs,sendSequence,frameCount,sequenceLength);
+             //printf("frameCount:%d\r\n",frameCount);
+			     //  showSendSequence(sendSequence,sequenceLength );
+						 beginSample(sampleSize);
+					 }
+ 				   if(frameCount == sequenceLength+1){
+						 /*打印采的AD值*/	
+					  // printf("frameCount:%d\r\n",frameCount-1);
+					 //  showOriginalValue(HT_IMS_ADC_ConvertedValue,sampleSize);
+					   /*去掉零时刻的值*/	
+  			     getOverlopSignal(HT_IMS_ADC_ConvertedValue,pOverlapSignal,sequenceLength,frameCount); 
+						 /*打印所有去掉零时刻的值，为n*n矩阵*/
+             //printf("pOverlapSignal\r\n");							 
+					   // showRecoverySignal(pOverlapSignal,sequenceLength);
+						 /*采样结束了*/	
+						  MatrixMultiply(&matrixPrbsInverse,&matrixOverlapSignal,&matrixRecoverySignal);  
+						 /*打印采样值n*n矩阵*/
+						//  printf("RecoverySignal\r\n");	
+						 // showRecoverySignal(pRecoverySignal,sequenceLength);
+						 /*对恢复的信号矩阵乘以scale*/
+						 //MatrixScale(&matrixRecoverySignal,scale, &matrixResult); 
+						 /*打印缩放后的n*n矩阵*/
+						 //printf("scalepResultSignal\r\n");	
+						 //showRecoverySignal(pResult,sequenceLength);	
+						 /*发送缩放后的n*n矩阵的第二行，发送的行可以在函数里设置*/						 
+						 //sendOverlap(pResult,sequenceLength);	
+						 /*循环移位后取平均*/	
+            						 
+						 getAverageSignal(pRecoverySignal,pAverageResult,sequenceLength,averageNumber); 
+ 						 /*打印平均数*/
+					   showResultSignal(pAverageResult,sequenceLength);
+						 frameCount = 1;
+						 flag = 0;
+           }
+					 
+					 break;
+				}
+ 	
+   }
 }
 
-void initialSequence(){
-//			if(initialNumber>0){
-//				free(coef);
-//				coef = NULL;
-//				free(sequenceProduct);
-//				sequenceProduct = NULL;
-//				free(HT_IMS_ADC_ConvertedValue);
-//				HT_IMS_ADC_ConvertedValue = NULL;
-//			
-//			}	
-      coef = createInitialCoef(Usart_Rx_Buf,porderLength);//构造系数
-	    timAdcPeriod = 200/overSampling - 1;//根据过采样系数来计算ADC的采样周期
-	    adcLowTime = 200/overSampling/2;
-	//	 	printf("coefLength:%d overSampling：%d\r\n",orderLength,overSampling);
-      //show_coef();
-			sequenceProduct = createSequence(coef,orderLength);//产生s序列
-			sequenceLength = pow(2,orderLength)-1; //计算序列长度
-	 
-	 	  buffsize = (initialNumber == 1)?(sequenceLength + 3)*overSampling:(sequenceLength + 2)*overSampling;//实际开辟的数组大小需要比sequenceLength大3
- //   buffsize = (initialNumber == 1)?sequenceLength + 3:sequenceLength + 2;//实际开辟的数组大小需要比sequenceLength大3
+ 
 
-//		  printf("sequenceLength:%d\r\n",sequenceLength);
-	//    printf("buffsize:%d\r\n",buffsize);
-			HT_IMS_ADC_ConvertedValue = (uint16_t*)malloc((buffsize+5)*sizeof(uint16_t));//根据上位机的命令开辟adc数据存储空间     
-			if(HT_IMS_ADC_ConvertedValue == NULL){
-	   		printf("adc malloc failure\r\n");
-			}
-			memset(HT_IMS_ADC_ConvertedValue, 0, sizeof(uint16_t));
-}
-void  beginSample(){
-	if(frame_count == 0){
-	     ADCX_Init(buffsize);
-	//		 printf("before firstSample DMA_GetCurrDataCounter:%d sequenceCount :%d sequenceLength :%d\r\n",DMA_GetCurrDataCounter(RHEOSTAT_ADC_DMA_STREAM),sequenceCount,sequenceLength);
-		   TIM1_GPIO_Config(SEQUENCE_PERIOD,SENIOR_PSC,SEQUENCE_PERIOD+1);//序列时钟初始化
-  	   TIM8_ADC_Config(timAdcPeriod,SENIOR_PSC,adcLowTime);//adc时钟初始化
-			 sequenceCount = 0;
-       TIM_Cmd(SENIOR_TIM, ENABLE);//开始采集
+ 
+void  beginSample(int number){
+	   //printf("1.sequenceCount:%d,adcSequenceCount:%d\r\n",sequenceCount,adcSequenceCount);
 
-  }
-	else{
-    if(initialNumber == 1){
- 				ADCX_Init(buffsize-overSampling);
+     sequenceCount = 0;
+	   adcSequenceCount = 0;
+		if(frameCount == 0){	
+			 ADCX_Init(number);
 
-	  }
-		else{
-        ADCX_Init(buffsize);		
+			 TIM1_GPIO_Config(sequencePeriod,SENIOR_PSC,sequencePeriod+1);//序列时钟初始化
+			
+  		 TIM8_ADC_Config(AdcPeriod,SENIOR_PSC,AdcLowTime);//adc时钟初始化
 		}
-     TIM1_GPIO_Config(SEQUENCE_PERIOD,SENIOR_PSC,SEQUENCE_PERIOD+1);//序列时钟初始化
-  	 TIM8_ADC_Config(timAdcPeriod,SENIOR_PSC,adcLowTime);//adc时钟初始化
-		 sequenceCount = 0;
+		else{
+			
+			 TIM_ClearFlag(TIM_ADC1,TIM_FLAG_Update);
+	     TIM_ClearITPendingBit(TIM_ADC1, TIM_IT_Update);    //清除 TIM2 更新中断标志
+			 TIM_ClearFlag(SENIOR_TIM,TIM_FLAG_Update);
+       TIM_ClearITPendingBit(SENIOR_TIM, TIM_IT_Update);  //清除 TIM2 更新中断标志
+       
+			 RHEOSTAT_ADC_DMA_STREAM->NDTR = number;            //重新装填DMA需要传输的数据个数
+       DMA_Cmd(RHEOSTAT_ADC_DMA_STREAM, ENABLE);          //先使能DMA通道
+       RHEOSTAT_ADC->SR &=~(0X01<<5);                     //将由硬件置1的ADC状态寄存器的溢出标志位清除，不然容易出错
+       ADC_DMACmd(RHEOSTAT_ADC, ENABLE);  
+			
+			 TIM_ITConfig(TIM_ADC1,TIM_IT_Update,ENABLE);    
+			 TIM_ITConfig(SENIOR_TIM,TIM_IT_Update,ENABLE); 
+
+		
+		}
+	  // printf("2.sequenceCount:%d,adcSequenceCount:%d\r\n",sequenceCount,adcSequenceCount);
+     
  		 TIM_Cmd(SENIOR_TIM, ENABLE);//开始采集
-//		 printf("before Sample DMA_GetCurrDataCounter:%d sequenceCount :%d sequenceLength :%d\r\n",DMA_GetCurrDataCounter(RHEOSTAT_ADC_DMA_STREAM),sequenceCount,sequenceLength);
-
-	}
+}
 	 
+ 
+void showHadamard(MatrixElementType *pHadamard,int hadamardOrder){
+   for(int i = 0;i < hadamardOrder*hadamardOrder;i++){
+	   printf("%.0f ",pHadamard[i]);
+		 if(i%hadamardOrder == hadamardOrder-1){
+			     printf("\r\n");
+			  }
+	 }
+ }
+ 
+
+ 
+void getOverlopSignal(uint16_t*HT_IMS_ADC_ConvertedValue,MatrixElementType *pOverlapSignal,int hadamardOrder,int framecount){
+ 	 int start = hadamardOrder*(framecount-2);
+	 for(int i = 0;i < hadamardOrder;i++){
+	    pOverlapSignal[i+start] = (MatrixElementType)HT_IMS_ADC_ConvertedValue[i+1];
+	 }
 }
-void DEBUG_USART_2_Send_Array(uint16_t send_array[],int number) //两个参数 一是数组(的数据) 二是数组长度1-255 
-{
-        //串口发送
-        int i=0;  //定义一个局部变量  用来 发送字符串 ++运算
-        while(i<number)
-        {                
-					 printf("%d\r\n",send_array[i]); 
-					// printf("%d %d\r\n",i,send_array[i]); 
-					 i++;					
-        }
-        
+void showRecoverySignal(MatrixElementType* array, int hadamardOrder){
+     int length = hadamardOrder*hadamardOrder; 
+     for(int i = 0;i < length;i++){
+       printf("%.2f  ", array[i]); 
+			 if(i%hadamardOrder == hadamardOrder-1){
+			     printf("\r\n");
+			 }
+		}	 
+}
+void showResultSignal(MatrixElementType* array, int hadamardOrder){
+     int length = hadamardOrder; 
+     for(int i = 0;i < length;i++){
+    // printf("%d,%.0f\r\n",i, array[i]); 
+			 printf("%.2f\r\n",array[i]); 
+		}	 
+}
+ void showOriginalValue(uint16_t*HT_IMS_ADC_ConvertedValue, int hadamardOrder){
+	 int length = hadamardOrder*(numberOfZero+1);
+	 for(int i = 1;i < length;i++){
+       printf("%d,%d\r\n",i,HT_IMS_ADC_ConvertedValue[i]); 		
+ 		 }	
+}	 
+
+void arraycircShift(MatrixElementType* array,int length,int shiftNumber){
+	
+	 int i, j, t;
+    
+   for (i = 0; i < shiftNumber; i++)
+    {
+      t = array[0];
+      for (j = 0; j < length; j++)
+      array[j] = array[j+1];        //前一项覆盖后一项
+      array[length - 1] = t;
+ 
+    }
+}
+void getAverageSignal(MatrixElementType*pResult,MatrixElementType* pAverageResult ,int hadamardOrder,int averageNumber){
+     for(int i = 0;i < averageNumber;i++){
+		    arraycircShift(pResult+hadamardOrder*i,hadamardOrder,i);
+     }
+		// printf("移位后Signal\r\n");	
+		 //showRecoverySignal(pResult,hadamardOrder);	
+
+		 for(int i = 0;i < hadamardOrder;i++){   
+		  for(int j = 0;j < averageNumber;j++){
+				pAverageResult[i] = pAverageResult[i]+pResult[i+hadamardOrder*j];
+			  
+			}
+   }
+	   for(int i = 0;i < hadamardOrder;i++){
+			 pAverageResult[i] = pAverageResult[i]/averageNumber;
+	 }
+
 }
 
-void clear_Usart_Rx_Buf(){
-	int i = 0;
-   while(i < recSize){
-	   Usart_Rx_Buf[i] = '0';
-		 i++;
-	 }
-}
-void show_Usart_Rx_Buf(){
-	int i = 0;
-   while(i < recSize){
-	   printf("%c",Usart_Rx_Buf[i]);
-		 i++;
-	 }
-	 printf("\r\n");
-}
-void show_Sequence(){
-   for(int i = 0;i < sequenceLength;i++){
-	   printf("%d ",sequenceProduct[i]);
-	 }
-	 printf("\r\n");
-}
-void show_coef(){
-	 printf("show_coef\r\n");
-   for(int i = 0;i < orderLength;i++){
-	   printf("%d ",coef[i]);	 
-	 }
-	 printf("\r\n");
-}
+ void sendOverlap(MatrixElementType*pResult,int hadamardOrder,int row){
+    for(int i = 0;i<hadamardOrder;i++){
+       printf("%.2f\r\n",pResult[(row-1)*hadamardOrder+i]);
+			// printf("%d,%.2f\r\n",i,pResult[hadamardOrder+i]);
+		}
+ }
+ void productSendSequence(MatrixElementType* pPrbs,u8* sendSuenquence,int frameCount,int sequenceLength)
+ {
+	  int start = (frameCount-1)*sequenceLength;
+//	   	 printf("pPrbs\r\n");
+//     showHadamard(pPrbs,sequenceLength);
+ 		for(int i = 0;i < sequenceLength;i++){
+			if(pPrbs[i+start]>0.5){
+		     sendSuenquence[i] = 1;
+			}
+			else{
+			   sendSuenquence[i] = 0;
+			}
+ 
+		}
+ 
+ 
+ }
+ 
+ void showSendSequence(u8* sendSuenquence,int length){
+   for(int i = 0;i < length;i++){
+	 		 	printf("%d ",sendSuenquence[i]);
+   }  
+ 
+ 
+ }

@@ -7,7 +7,7 @@
 
   <Targets>
     <Target>
-      <TargetName>ADC-单通道-中断</TargetName>
+      <TargetName>HT-IMS</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <pCCUsed>5060750::V5.06 update 6 (build 750)::ARMCC</pCCUsed>
@@ -336,9 +336,9 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls></MiscControls>
-              <Define>USE_STDPERIPH_DRIVER,STM32F429_439xx,</Define>
+              <Define>USE_STDPERIPH_DRIVER,STM32F429_439xx,ARM_MATH_CM4</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\Libraries\CMSIS\Device\ST\STM32F4xx\Include;..\..\Libraries\STM32F4xx_StdPeriph_Driver\inc;..\..\User;..\..\Libraries\CMSIS\Include;..\..\User\time;..\..\User\sequence;..\..\User\key;..\..\User\usart_dma;..\..\User\led;..\..\User\usart;..\..\User\HadamardOutput;..\..\User\adc;..\..\User\systick</IncludePath>
+              <IncludePath>..\..\Libraries\CMSIS\Device\ST\STM32F4xx\Include;..\..\Libraries\STM32F4xx_StdPeriph_Driver\inc;..\..\User;..\..\Libraries\CMSIS\Include;..\..\User\time;..\..\User\sequence;..\..\User\key;..\..\User\usart_dma;..\..\User\led;..\..\User\usart;..\..\User\HadamardOutput;..\..\User\adc;..\..\User\systick;..\..\User\sdram;..\..\User\hadamard</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -360,7 +360,7 @@
             </VariousControls>
           </Aads>
           <LDads>
-            <umfTarg>1</umfTarg>
+            <umfTarg>0</umfTarg>
             <Ropi>0</Ropi>
             <Rwpi>0</Rwpi>
             <noStLib>0</noStLib>
@@ -369,7 +369,7 @@
             <TextAddressRange>0x08000000</TextAddressRange>
             <DataAddressRange>0x20000000</DataAddressRange>
             <pXoBase></pXoBase>
-            <ScatterFile></ScatterFile>
+            <ScatterFile>..\..\Output\ADC-单通道-中断.sct</ScatterFile>
             <IncludeLibs></IncludeLibs>
             <IncludeLibsPath></IncludeLibsPath>
             <Misc></Misc>
@@ -708,6 +708,16 @@
               <FileType>1</FileType>
               <FilePath>..\..\User\usart_dma\usart_dma.c</FilePath>
             </File>
+            <File>
+              <FileName>bsp_sdram.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\sdram\bsp_sdram.c</FilePath>
+            </File>
+            <File>
+              <FileName>hadamard.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\hadamard\hadamard.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -717,6 +727,136 @@
               <FileName>必读说明.txt</FileName>
               <FileType>5</FileType>
               <FilePath>..\..\必读说明.txt</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>MATRIX</GroupName>
+          <Files>
+            <File>
+              <FileName>arm_mat_add_f32.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\MatrixFunctions\arm_mat_add_f32.c</FilePath>
+            </File>
+            <File>
+              <FileName>arm_mat_add_q15.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\MatrixFunctions\arm_mat_add_q15.c</FilePath>
+            </File>
+            <File>
+              <FileName>arm_mat_add_q31.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\MatrixFunctions\arm_mat_add_q31.c</FilePath>
+            </File>
+            <File>
+              <FileName>arm_mat_cmplx_mult_f32.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\MatrixFunctions\arm_mat_cmplx_mult_f32.c</FilePath>
+            </File>
+            <File>
+              <FileName>arm_mat_cmplx_mult_q15.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\MatrixFunctions\arm_mat_cmplx_mult_q15.c</FilePath>
+            </File>
+            <File>
+              <FileName>arm_mat_cmplx_mult_q31.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\MatrixFunctions\arm_mat_cmplx_mult_q31.c</FilePath>
+            </File>
+            <File>
+              <FileName>arm_mat_init_f32.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\MatrixFunctions\arm_mat_init_f32.c</FilePath>
+            </File>
+            <File>
+              <FileName>arm_mat_init_q15.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\MatrixFunctions\arm_mat_init_q15.c</FilePath>
+            </File>
+            <File>
+              <FileName>arm_mat_init_q31.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\MatrixFunctions\arm_mat_init_q31.c</FilePath>
+            </File>
+            <File>
+              <FileName>arm_mat_inverse_f32.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\MatrixFunctions\arm_mat_inverse_f32.c</FilePath>
+            </File>
+            <File>
+              <FileName>arm_mat_inverse_f64.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\MatrixFunctions\arm_mat_inverse_f64.c</FilePath>
+            </File>
+            <File>
+              <FileName>arm_mat_mult_f32.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\MatrixFunctions\arm_mat_mult_f32.c</FilePath>
+            </File>
+            <File>
+              <FileName>arm_mat_mult_fast_q15.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\MatrixFunctions\arm_mat_mult_fast_q15.c</FilePath>
+            </File>
+            <File>
+              <FileName>arm_mat_mult_fast_q31.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\MatrixFunctions\arm_mat_mult_fast_q31.c</FilePath>
+            </File>
+            <File>
+              <FileName>arm_mat_mult_q15.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\MatrixFunctions\arm_mat_mult_q15.c</FilePath>
+            </File>
+            <File>
+              <FileName>arm_mat_mult_q31.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\MatrixFunctions\arm_mat_mult_q31.c</FilePath>
+            </File>
+            <File>
+              <FileName>arm_mat_scale_f32.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\MatrixFunctions\arm_mat_scale_f32.c</FilePath>
+            </File>
+            <File>
+              <FileName>arm_mat_scale_q15.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\MatrixFunctions\arm_mat_scale_q15.c</FilePath>
+            </File>
+            <File>
+              <FileName>arm_mat_scale_q31.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\MatrixFunctions\arm_mat_scale_q31.c</FilePath>
+            </File>
+            <File>
+              <FileName>arm_mat_sub_f32.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\MatrixFunctions\arm_mat_sub_f32.c</FilePath>
+            </File>
+            <File>
+              <FileName>arm_mat_sub_q15.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\MatrixFunctions\arm_mat_sub_q15.c</FilePath>
+            </File>
+            <File>
+              <FileName>arm_mat_sub_q31.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\MatrixFunctions\arm_mat_sub_q31.c</FilePath>
+            </File>
+            <File>
+              <FileName>arm_mat_trans_f32.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\MatrixFunctions\arm_mat_trans_f32.c</FilePath>
+            </File>
+            <File>
+              <FileName>arm_mat_trans_q15.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\MatrixFunctions\arm_mat_trans_q15.c</FilePath>
+            </File>
+            <File>
+              <FileName>arm_mat_trans_q31.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\MatrixFunctions\arm_mat_trans_q31.c</FilePath>
             </File>
           </Files>
         </Group>

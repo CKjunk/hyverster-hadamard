@@ -24,7 +24,7 @@
 #define DMA_ADC_COMP_INT_CHANNEL  DMA2_Stream0_IRQn
 
 #define DMA_ADC_COMP_INT_FUNCTION DMA2_Stream0_IRQHandler
-void ADCX_Init(int buffsize);
+void ADCX_Init(int buffsize );
 
 #endif /* __BSP_ADC_H */
 

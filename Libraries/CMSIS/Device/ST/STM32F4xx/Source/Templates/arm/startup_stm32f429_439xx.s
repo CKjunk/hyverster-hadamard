@@ -1,4 +1,4 @@
-;******************** (C) COPYRIGHT 2015 STMicroelectronics ********************
+ ;******************** (C) COPYRIGHT 2015 STMicroelectronics ********************
 ;* File Name          : startup_stm32f429_439xx.s
 ;* Author             : MCD Application Team
 ;* @version           : V1.5.0
@@ -49,12 +49,15 @@ __initial_sp
 ;   <o>  Heap Size (in Bytes) <0x0-0xFFFFFFFF:8>
 ; </h>
 
-Heap_Size       EQU     0x0002E000
+
+Heap_Size       EQU     0x00000200
 
                 AREA    HEAP, NOINIT, READWRITE, ALIGN=3
-__heap_base
+
+
+__heap_base 	
 Heap_Mem        SPACE   Heap_Size
-__heap_limit
+__heap_limit    EQU   0xd4000000    ;设置堆空间的极限地址(SDRAM),
 
                 PRESERVE8
                 THUMB
@@ -187,9 +190,16 @@ Reset_Handler    PROC
                  EXPORT  Reset_Handler             [WEAK]
         IMPORT  SystemInit
         IMPORT  __main
+;从外部文件引入声明
+        IMPORT SDRAM_Init
+			 LDR     R0, =SystemInit
+             BLX     R0
+;在__main之前调用SDRAM_Init进行初始化
 
-                 LDR     R0, =SystemInit
-                 BLX     R0
+				 
+				 LDR   R0, =SDRAM_Init
+				 BLX   R0
+                
                  LDR     R0, =__main
                  BX      R0
                  ENDP

@@ -53,15 +53,20 @@ void TIM1_GPIO_Config(u16 period,u16 psc,u16 adc_pwm_lowtime){
   TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_High;  	  //当定时器计数值小于CCR1_Val时为低电平
   TIM_OC1Init(SENIOR_TIM, &TIM_OCInitStructure);	 //使能通道1
 
-	NVIC_InitStructure.NVIC_IRQChannel = SENIOR_TIM_INT_CHANNEL;  //TIM2中断
+
+	
+		
+	TIM_ITConfig(SENIOR_TIM,TIM_IT_Update,ENABLE); //使能指定的TIM2中断,允许更新中断
+  TIM_ClearFlag(SENIOR_TIM,TIM_FLAG_Update);
+	TIM_ClearITPendingBit(SENIOR_TIM, TIM_IT_Update); //清除 TIM2 更新中断标志
+
+  NVIC_InitStructure.NVIC_IRQChannel = SENIOR_TIM_INT_CHANNEL;  //TIM2中断
 	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;  //先占优先级0级
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 3;  //从优先级3级
+	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;  //从优先级3级
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE; //IRQ通道被使能
 	NVIC_Init(&NVIC_InitStructure);  //初始化NVIC寄存器
-	
-  TIM_ClearFlag(SENIOR_TIM, TIM_FLAG_Update);
-	TIM_ITConfig(SENIOR_TIM,TIM_IT_Update,ENABLE); //使能指定的TIM2中断,允许更新中断
-	/*使能通道1重载*/
+
+/*使能通道1重载*/
 	TIM_OC1PreloadConfig(SENIOR_TIM, TIM_OCPreload_Enable);
   
 	TIM_CtrlPWMOutputs(SENIOR_TIM, ENABLE);///////主输出使能
@@ -95,7 +100,7 @@ void TIM8_ADC_Config(u16 arr,u16 psc,u16 adc_pwm_lowtime ){
     // 计数方式
     TIM_TimeBaseStructure.TIM_CounterMode=TIM_CounterMode_Up;
     // 重复计数器，这里没使用
-    TIM_TimeBaseStructure.TIM_RepetitionCounter=0;
+    TIM_TimeBaseStructure.TIM_RepetitionCounter= 0;
     TIM_TimeBaseInit(TIM_ADC1, &TIM_TimeBaseStructure);
 		
 		//TIM_SelectOutputTrigger(TIM_ADC1,TIM_TRGOSource_Update);
@@ -114,23 +119,24 @@ void TIM8_ADC_Config(u16 arr,u16 psc,u16 adc_pwm_lowtime ){
     TIM_OC1Init(TIM_ADC1, &TIM_OCInitStructure);
     // 使能通道重装载
     TIM_OC1PreloadConfig(TIM_ADC1, TIM_OCPreload_Enable);
+	
 		
-		NVIC_InitStructure.NVIC_IRQChannel = TIM_ADC1_IRQn;  //TIM8中断
+ 
+	  TIM_DMACmd(TIM_ADC1, TIM_DMA_Update, ENABLE);  //定时器更新事件触发DMA传输
+		
+
+    TIM_ITConfig(TIM_ADC1,TIM_IT_Update,ENABLE); //使能指定的TIM8中断,允许更新中断
+    TIM_ClearFlag(TIM_ADC1,TIM_FLAG_Update);
+		TIM_ClearITPendingBit(TIM_ADC1, TIM_IT_Update); //清除 TIM2 更新中断标志
+
+    NVIC_InitStructure.NVIC_IRQChannel = TIM_ADC1_IRQn;  //TIM8中断
 		NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;  //先占优先级0级
-		NVIC_InitStructure.NVIC_IRQChannelSubPriority = 3;  //从优先级3级
+		NVIC_InitStructure.NVIC_IRQChannelSubPriority = 2;  //从优先级3级
 		NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE; //IRQ通道被使能
 		NVIC_Init(&NVIC_InitStructure);  //初始化NVIC寄存器
-		
-		
-	//	TIM_ITConfig(TIM_ADC1,TIM_IT_Update,ENABLE); //使能指定的TIM2中断,允许更新中断
+	  TIM_CtrlPWMOutputs(TIM_ADC1, ENABLE);///////主输出使能
+			
 
-	  TIM_DMACmd(TIM_ADC1, TIM_DMA_Update, ENABLE);  //定时器更新事件触发DMA传输
-
-	  TIM_ClearFlag(TIM_ADC1, TIM_FLAG_Update);
-
-	//	TIM_ITConfig(TIM_ADC1,TIM_IT_Update,ENABLE); //使能指定的TIM8中断,允许更新中断
-    TIM_CtrlPWMOutputs(TIM_ADC1, ENABLE);///////主输出使能
-		
 // 使能定时器
 	 TIM_SelectMasterSlaveMode(SENIOR_TIM, TIM_MasterSlaveMode_Enable);//主从模式MSM
 	 TIM_SelectOutputTrigger(SENIOR_TIM, TIM_TRGOSource_Enable);//触发选择,ITR0即TIM1

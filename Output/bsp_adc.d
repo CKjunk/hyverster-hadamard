@@ -38,3 +38,9 @@
 ..\..\output\bsp_adc.o: ..\..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_fmc.h
 ..\..\output\bsp_adc.o: ..\..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_ltdc.h
 ..\..\output\bsp_adc.o: ..\..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_sai.h
+..\..\output\bsp_adc.o: ..\..\User\hadamard\hadamard.h
+..\..\output\bsp_adc.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
+..\..\output\bsp_adc.o: ..\..\Libraries\CMSIS\Include\arm_math.h
+..\..\output\bsp_adc.o: ..\..\Libraries\CMSIS\Include\core_cm4.h
+..\..\output\bsp_adc.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
+..\..\output\bsp_adc.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h

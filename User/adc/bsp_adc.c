@@ -1,6 +1,6 @@
 #include "./adc/bsp_adc.h"
-//uint16_t  HT_IMS_ADC_ConvertedValue[1026];
-volatile  uint16_t*  HT_IMS_ADC_ConvertedValue;
+#include "hadamard.h"
+uint16_t* HT_IMS_ADC_ConvertedValue;
 
 static void Rheostat_ADC_GPIO_Config(void)
 {
@@ -38,10 +38,10 @@ static void Rheostat_ADC_Mode_Config(int buffsize)  //注意这个buffsize只有在程序
 	DMA_InitStructure.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
   // 存储器地址固定
 	DMA_InitStructure.DMA_MemoryInc = DMA_MemoryInc_Enable; 
-  // // 外设数据大小为半字，即两个字节 
+  // 外设数据大小为半字，即两个字节 
 	DMA_InitStructure.DMA_PeripheralDataSize = DMA_PeripheralDataSize_HalfWord; 
-  //	存储器数据大小也为半字，跟外设数据大小相同
-	DMA_InitStructure.DMA_MemoryDataSize = DMA_MemoryDataSize_HalfWord;	
+  // 存储器数据大小也为半字，跟外设数据大小相同
+	DMA_InitStructure.DMA_MemoryDataSize = DMA_MemoryDataSize_Word;	
 	// 循环传输模式
 	DMA_InitStructure.DMA_Mode = DMA_Mode_Normal;
   // DMA 传输通道优先级为高，当使用一个DMA通道时，优先级设置不影响
@@ -69,7 +69,7 @@ static void Rheostat_ADC_Mode_Config(int buffsize)  //注意这个buffsize只有在程序
   // 禁止DMA直接访问模式	
   ADC_CommonInitStructure.ADC_DMAAccessMode = ADC_DMAAccessMode_Disabled;
   // 采样时间间隔	
-  ADC_CommonInitStructure.ADC_TwoSamplingDelay = ADC_TwoSamplingDelay_20Cycles;  
+  ADC_CommonInitStructure.ADC_TwoSamplingDelay = ADC_TwoSamplingDelay_16Cycles;  
   ADC_CommonInit(&ADC_CommonInitStructure);
   // -------------------ADC Init 结构体 参数 初始化--------------------------
 	ADC_StructInit(&ADC_InitStructure);
@@ -92,27 +92,27 @@ static void Rheostat_ADC_Mode_Config(int buffsize)  //注意这个buffsize只有在程序
   //---------------------------------------------------------------------------
 	
   // 配置 ADC 通道转换顺序为1，第一个转换，采样时间为3个时钟周期
- ADC_RegularChannelConfig(RHEOSTAT_ADC, RHEOSTAT_ADC_CHANNEL, 1, ADC_SampleTime_480Cycles);
+ ADC_RegularChannelConfig(RHEOSTAT_ADC, RHEOSTAT_ADC_CHANNEL, 1, ADC_SampleTime_144Cycles);
 
   // 使能DMA请求 after last transfer (Single-ADC mode)
   ADC_DMARequestAfterLastTransferCmd(RHEOSTAT_ADC, ENABLE);
-	
+	DMA_ClearFlag(RHEOSTAT_ADC_DMA_STREAM,DMA_FLAG_TCIF0); /* 清除相关状态标识 */ 
+	DMA_ClearFlag(RHEOSTAT_ADC_DMA_STREAM,DMA_FLAG_HTIF0);
+  DMA_ITConfig(RHEOSTAT_ADC_DMA_STREAM,DMA_IT_TC, ENABLE);		//使能传输完成中断
 	NVIC_InitStructure.NVIC_IRQChannel = DMA_ADC_COMP_INT_CHANNEL;  //TIM2中断
 	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;  //先占优先级0级
 	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 3;  //从优先级3级
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE; //IRQ通道被使能
 	NVIC_Init(&NVIC_InitStructure);  //初始化NVIC寄存器
 	
-	
-  DMA_ClearFlag(RHEOSTAT_ADC_DMA_STREAM,DMA_FLAG_TCIF0); /* 清除相关状态标识 */ 
-	DMA_ClearFlag(RHEOSTAT_ADC_DMA_STREAM,DMA_FLAG_HTIF0);
-  DMA_ITConfig(RHEOSTAT_ADC_DMA_STREAM,DMA_IT_TC, ENABLE);		//使能传输完成中断
+	  
+  
  
-// 使能ADC DMA
+  // 使能ADC DMA
   ADC_DMACmd(RHEOSTAT_ADC, ENABLE);
 	// 使能ADC
   ADC_Cmd(RHEOSTAT_ADC, ENABLE);  
-  //开始adc转换，软件触发
+  // 开始adc转换，软件触发
 }
 
 void ADCX_Init(int buffsize){

@@ -49,3 +49,7 @@
 ..\..\output\main.o: ..\..\User\./systick/bsp_SysTick.h
 ..\..\output\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
 ..\..\output\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
+..\..\output\main.o: ..\..\Libraries\CMSIS\Include\arm_math.h
+..\..\output\main.o: ..\..\Libraries\CMSIS\Include\core_cm4.h
+..\..\output\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
+..\..\output\main.o: ..\..\User\hadamard\hadamard.h
