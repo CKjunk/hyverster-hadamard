@@ -49,9 +49,9 @@ int frameCount = 0;
 int flag = 10;  //总的flag
 int sequenceCount = 0;  	 //发送的序列计数
 int initialNumber = 0;
-int  adcSequenceCount = 0;
-int  errorSample = 3;
-int  sampleSize = 0;
+int adcSequenceCount = 0;
+int errorSample = 3;
+int sampleSize = 0;
 int main(void)
 {		
 		SysTick_Init();
@@ -61,14 +61,14 @@ int main(void)
     sampleSize = sequenceLength+1;
     volatile int frame_count = 0;  //帧数计数
 	 	
-	
-	
 	  MatrixType  matrixPrbs;
+	
 		MatrixType  matrixPrbsTemp;
 
     MatrixType  matrixPrbsInverse; 
 	
 	  MatrixType  matrixRecoverySignal;  
+	
 	  MatrixType  matrixValidateResult;  
 	
 	  MatrixType  matrixOverlapSignal;  
@@ -77,7 +77,6 @@ int main(void)
 
     HT_IMS_ADC_ConvertedValue = (uint16_t*)malloc((sequenceLength + 2)* sizeof(uint16_t)); 
 	 	
-	
 	  MatrixElementType* pHadamard = NULL;
 	 
   	MatrixElementType* pPrbs = NULL; 
@@ -138,6 +137,7 @@ int main(void)
 	 // showSendSequence(sendSequence,sequenceLength );
     /*开始采一次样并把采样值抛掉*/
  	  beginSample(sampleSize);
+		 
     while (1){
 			
 		 switch(flag){
@@ -161,7 +161,7 @@ int main(void)
 			 
 			 case 2:  
 				  // printf("adc complete\r\n");
-				   flag = 10;
+				    flag = 10;
 			 		 /*framecount为2时才代表第一次采样*/						 
             frameCount++;
 			    // printf("frameCount:%d\r\n",frameCount);
@@ -175,7 +175,7 @@ int main(void)
 					//	printf("HT_IMS_ADC_ConvertedValue\r\n");
 						/*打印采的AD值*/						 
 					 // printf("frameCount:%d\r\n",frameCount-1);
-					//  showOriginalValue(HT_IMS_ADC_ConvertedValue,sampleSize);
+					  //showOriginalValue(HT_IMS_ADC_ConvertedValue,sampleSize);
 						/*去掉零时刻的值*/	
 						 getOverlopSignal(HT_IMS_ADC_ConvertedValue,pOverlapSignal,sequenceLength,frameCount);
  						 Delay_ms(5);
@@ -187,18 +187,18 @@ int main(void)
 					 }
  				   if(frameCount == sequenceLength+1){
 						 /*打印采的AD值*/	
-					  // printf("frameCount:%d\r\n",frameCount-1);
-					 //  showOriginalValue(HT_IMS_ADC_ConvertedValue,sampleSize);
+					   //printf("frameCount:%d\r\n",frameCount-1);
+					   //showOriginalValue(HT_IMS_ADC_ConvertedValue,sampleSize);
 					   /*去掉零时刻的值*/	
   			     getOverlopSignal(HT_IMS_ADC_ConvertedValue,pOverlapSignal,sequenceLength,frameCount); 
 						 /*打印所有去掉零时刻的值，为n*n矩阵*/
              //printf("pOverlapSignal\r\n");							 
-					   // showRecoverySignal(pOverlapSignal,sequenceLength);
+					   //showRecoverySignal(pOverlapSignal,sequenceLength);
 						 /*采样结束了*/	
 						  MatrixMultiply(&matrixPrbsInverse,&matrixOverlapSignal,&matrixRecoverySignal);  
 						 /*打印采样值n*n矩阵*/
-						//  printf("RecoverySignal\r\n");	
-						 // showRecoverySignal(pRecoverySignal,sequenceLength);
+						 //printf("RecoverySignal\r\n");	
+						 //showRecoverySignal(pRecoverySignal,sequenceLength);
 						 /*对恢复的信号矩阵乘以scale*/
 						 //MatrixScale(&matrixRecoverySignal,scale, &matrixResult); 
 						 /*打印缩放后的n*n矩阵*/
@@ -254,7 +254,7 @@ void  beginSample(int number){
 		
 		}
 	  // printf("2.sequenceCount:%d,adcSequenceCount:%d\r\n",sequenceCount,adcSequenceCount);
-     
+    
  		 TIM_Cmd(SENIOR_TIM, ENABLE);//开始采集
 }
 	 
