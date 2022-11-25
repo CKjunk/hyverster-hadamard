@@ -28,10 +28,12 @@ extern int AdcPeriod;
 extern int AdcLowTime;	
 extern uint16_t* HT_IMS_ADC_ConvertedValue;
 extern int errorSample;
+extern int sampleSize;
 u8 MODIFY_TIM8_PULSE = 1;
 void TOTAL_PROJECT_INT_FUNCTION(void){
 	if(EXTI_GetITStatus(KEY_INT_EXTI_LINE)!= RESET){
  		/*开始采集*/
+	  
    flag = 0  ;  
    EXTI_ClearITPendingBit(EXTI_Line0); //清除LINE0上的中断标志位
 

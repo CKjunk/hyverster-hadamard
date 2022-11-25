@@ -13,6 +13,9 @@ typedef   arm_matrix_instance_f32 MatrixType;
 #define   MatrixScale     arm_mat_scale_f32 
 #define   MatrixInverse   arm_mat_inverse_f32
 MatrixElementType * hadamard(int n);
-
+void SWAP(MatrixElementType* a, MatrixElementType* b);
+void transposingMatrix(MatrixElementType* a, int m, int n);
 MatrixElementType * prbs(MatrixElementType *pHadamard,int n);
+MatrixElementType* calculate(int a_row, int a_col, MatrixElementType *a, int b_row,int b_col, MatrixElementType *b);
+void createInverseMatrix(MatrixElementType *prbs,int length);
 #endif
